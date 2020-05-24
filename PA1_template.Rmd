@@ -33,23 +33,27 @@ cleanBase <- baseData[!baseDataNA,]
 SummedDataByDay <- aggregate(baseData$steps, by=list(baseData$date), sum)
 names(SummedDataByDay)[1] ="date"
 names(SummedDataByDay)[2] ="totalsteps"
-head(SummedDataByDay,15)
 ```
 
 ### 2. Make a histogram of the total number of steps taken each day
 ```{r stepshistogram}
 ggplot(SummedDataByDay, aes(x = totalsteps)) +
-  geom_histogram(fill = "steelblue", binwidth=1000) +
-  labs(title = "Total Daily Steps", x = "Steps", y = "Frequency")
+  geom_histogram(binwidth=1000,fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+  labs(title = "Total Daily Steps", x = "Steps", y = "Frequency")+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ### 3. Calculate and report the mean and median of the total number of steps taken per day
 ```{r mean}
-mean(SummedDataByDay$totalsteps,na.rm=TRUE)
+m1 = mean(SummedDataByDay$totalsteps,na.rm=TRUE)
+
+sprintf("Mean steps taken per day is: %s", m1)
 ```
 
 ```{r median}
-median(SummedDataByDay$totalsteps,na.rm=TRUE)
+m2 = median(SummedDataByDay$totalsteps,na.rm=TRUE)
+
+sprintf("Median steps taken per day is: %s", m2)
 ```
 
 ## What is the average daily activity pattern?
@@ -64,14 +68,20 @@ names(MeanDataByInterval)[2] ="steps"
 
 ggplot(MeanDataByInterval, aes(x = interval, y=steps)) +
   labs(title = "Sum of Steps by Interval", x = "interval", y = "steps")+
-  geom_line(color="red") 
+  geom_line() +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r maxinteral}
 maxInterval <- MeanDataByInterval[which.max(MeanDataByInterval$steps),]
-maxInterval
+m3 = maxInterval[1]
+m4 = maxInterval[2]
+
+sprintf("Interval with maximum number of stpes: %s", m3)
+sprintf("This interval has: %s steps", m4)
+
 ```
 
 ## Imputing missing values
@@ -80,10 +90,12 @@ maxInterval
 
 ```{r nalist}
 missingVals <- sum(baseDataNA)
-missingVals
+sprintf("Total missing values: %s", missingVals)
 ```
 
 ### 2/3. Devise a strategy for filling in all of the missing values in the dataset.Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+Using Mean to inpute missing values
 
 ```{r missingvalue}
 baseData2 <- baseData
@@ -109,15 +121,20 @@ FullSummedDataByDay <- aggregate(baseData2$steps, by=list(baseData2$date), sum)
 
 names(FullSummedDataByDay)[1] ="date"
 names(FullSummedDataByDay)[2] ="totalsteps"
-head(FullSummedDataByDay,15)
 
 ggplot(FullSummedDataByDay, aes(x = totalsteps)) +
-  geom_histogram(fill = "steelblue", binwidth=1000) +
-  labs(title = "Total Daily Steps", x = "Steps", y = "Frequency")
+  geom_histogram(binwidth=1000,fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+  labs(title = "Total Daily Steps", x = "Steps", y = "Frequency")+
+    theme(plot.title = element_text(hjust = 0.5))
 
-mean(FullSummedDataByDay$totalsteps)
+m5 = mean(FullSummedDataByDay$totalsteps)
 
-median(FullSummedDataByDay$totalsteps)
+sprintf("Mean steps taken per day is: %s", m5)
+
+m6 = median(FullSummedDataByDay$totalsteps)
+
+sprintf("Median steps taken per day is: %s", m6)
+
 ```
 
 ### 4b/4c. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
@@ -130,8 +147,6 @@ The effect of using mean data per interval as a data impute method for missing v
 ```{r weekend}
 baseData2$weekday <- weekdays(baseData2$date)
 baseData2$weekend <- ifelse (baseData2$weekday == "Saturday" | baseData2$weekday == "Sunday", "Weekend", "Weekday")
-#baseData2$weekend <- as.factor(baseData2$weekend)
-head(baseData2,5)
 
 MeanDataWeekendWeekday <- aggregate(baseData2$steps, by=list(baseData2$weekend, baseData2$interval), mean)
 names(MeanDataWeekendWeekday)[1] ="weekend"
@@ -141,7 +156,9 @@ names(MeanDataWeekendWeekday)[3] ="steps"
 ggplot(MeanDataWeekendWeekday, aes(x = interval, y=steps, color=weekend)) +
   geom_line() +
   facet_grid(weekend ~ .) +
-  labs(title = "Mean of Steps by Interval", x = "interval", y = "steps")
+  labs(title = "Mean of Steps by Interval", x = "interval", y = "steps")+
+    theme(plot.title = element_text(hjust = 0.5))
+
 
 ```
 
